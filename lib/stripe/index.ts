@@ -15,10 +15,17 @@ import Stripe from "stripe";
  *   STRIPE_CONNECT_ACCOUNT_ID = acct_xxx   (your connected Stripe account)
  *   STRIPE_PLATFORM_FEE_PERCENT = 1   (platform takes 1% of every transaction)
  */
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-02-24.acacia",
-  typescript: true,
-});
+// Fall back to a placeholder so `new Stripe()` doesn't throw at build time
+// when STRIPE_SECRET_KEY isn't configured. Real Stripe calls still require a
+// valid key at runtime — this only keeps `next build` from crashing while
+// collecting page data for projects that don't use Stripe.
+export const stripe = new Stripe(
+  process.env.STRIPE_SECRET_KEY ?? "sk_test_placeholder_build_only",
+  {
+    apiVersion: "2025-02-24.acacia",
+    typescript: true,
+  },
+);
 
 // Set when this app was provisioned through a Connect platform
 export const CONNECT_ACCOUNT_ID = process.env.STRIPE_CONNECT_ACCOUNT_ID as
